@@ -1,0 +1,39 @@
+version: 2.1
+jobs:
+  Build-and-Test:
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      - run: 
+          name: "Build and Run Server Container"
+          command: |
+            docker build -t image:test .
+            docker run --name "grpc-node-server" -p 50051:50051 -d image:test
+      - run:
+          name: "Install Node Packages"
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_17.x | sudo -E bash -
+            sudo apt-get update 
+            sudo apt-get install -y nodejs
+            npm install
+      - run:
+          name: "Run Tests"
+          command: npm run test
+      - run:
+          name: "Wrapping Test Result"
+          command: "tar -cvf artifact.tar reports/"
+      - store_artifacts:
+          path: artifact.tar
+      - run:
+          name: "Upload Code Coverage Result"
+          command: |
+            npm run coverage
+            curl -Os https://uploader.codecov.io/latest/linux/codecov 
+            chmod +x codecov 
+            ./codecov --token=${CODECOV_TOKEN}   
+
+workflows:
+  GRPC-Test-Workflow:
+    jobs:
+      - Build-and-Test
