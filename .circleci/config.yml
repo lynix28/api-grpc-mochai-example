@@ -2,7 +2,8 @@ version: 2.1
 jobs:
   Build-and-Test:
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2204:current
+    resource_class: xlarge
     steps:
       - checkout
       - run: 
