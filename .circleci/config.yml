@@ -3,7 +3,6 @@ jobs:
   Build-and-Test:
     machine:
       image: ubuntu-2204:current
-    resource_class: xlarge
     steps:
       - checkout
       - run: 
